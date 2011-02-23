@@ -1,0 +1,4 @@
+TODO:
+- Check paths
+- Check IE7/IE8
+- Need to add <!--[if IE] explanation to the readme

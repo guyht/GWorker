@@ -1,0 +1,67 @@
+<!--
+/*
+ *  GWorker - Enables Web Worker functionality in IE and non HTML5 compatible
+ *  browsers.
+ *
+ *  Copyright (C) 2011  Guy Halford-Thompson
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<html>
+	<head>
+		<style type='text/css'>
+			div#wiki_div {
+				padding-bottom: 20px;
+				padding-left: 20px;
+				background-color: #404040;
+				color: #c5c1bc;
+				font-size: 12px;
+				font-family: "Courier New", Courier, Monaco;
+				border-width: 1px;
+				border-style: solid;
+				border-color: #979797;
+			}
+		</style>
+		<title>GWorker Example - SHA-256</title>
+		<!-- Require GWorker script & jQuery -->
+        <script src="../../jquery.js" type="text/javascript" charset="utf-8"></script>
+		<!--[if IE]>
+		<script type="text/javascript" src="../../gworker.js"></script>
+		<![endif]-->
+	 </head>
+	<body onload='init()'>
+
+		<script type="text/javascript">
+			function init() {
+						document.sha256 = new Worker('sha-256-worker.js');
+						document.sha256.onerror = function(event){
+							throw new Error(event.message + " (" + event.filename + ":" + event.lineno + ")");
+						};
+
+						document.sha256.onmessage = function(event) {
+							document.getElementById('sha256_div').value = event.data;
+						};
+					}
+
+					function post(obj) {
+						document.sha256.postMessage(document.getElementById('sha256_input').value);
+					}
+		</script>
+		<p>This example uses an external library to calculate the SHA-256 hash of the input.  When using a non HTML5 compliant browser, the SHA-256 library is loaded using the jQuery AJAX library</p>
+		Input: <input id='sha256_input' type='text'/><br />
+		Sha-256: <input id='sha256_div' type='text' size='100'/><br />
+		<button onclick='post(this);'>Calculate</button>
+	</body>
+</html>

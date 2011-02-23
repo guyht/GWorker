@@ -1,0 +1,75 @@
+<!--
+/*
+ *  GWorker - Enables Web Worker functionality in IE and non HTML5 compatible
+ *  browsers.
+ *
+ *  Copyright (C) 2011  Guy Halford-Thompson
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<html>
+	<head>
+		<style type='text/css'>
+			div#wiki_div {
+				padding-bottom: 20px;
+				padding-left: 20px;
+				background-color: #404040;
+				color: #c5c1bc;
+				font-size: 12px;
+				font-family: "Courier New", Courier, Monaco;
+				border-width: 1px;
+				border-style: solid;
+				border-color: #979797;
+			}
+		</style>
+		<title>GWorker Example</title>
+		<!-- Require GWorker script & jQuery -->
+        <script src="../../jquery.js" type="text/javascript" charset="utf-8"></script>
+		<!--[if IE]>
+		<script type="text/javascript" src="../../gworker.js"></script>
+		<![endif]-->
+	 </head>
+	<body onload='init()'>
+
+		<script type="text/javascript">
+			function init() {
+						document.parser = new Worker('Parser.js');
+						document.parser.onerror = function(event){
+							throw new Error(event.message + " (" + event.filename + ":" + event.lineno + ")");
+						};
+
+						document.parser.onmessage = function(event) {
+							document.getElementById('wiki_div').innerHTML = event.data;
+						};
+						document.parser.postMessage(document.getElementById('wiki_textarea').value);
+
+					}
+
+					function parse(obj) {
+						document.parser.postMessage(obj.value);
+					}
+		</script>
+		<h3>Wiki Parser</h3>
+		<p>Simply type in the box below...</p>
+		<div id='wiki_div'></div>
+		<br />
+		<textarea id='wiki_textarea' onkeyup='parse(this)' cols='70' rows='10'>
+= Header 1 =
+== Header 2==
+*Some bold text* _and some italic text_
+This text is normal
+		</textarea>
+	</body>
+</html>
