@@ -50,6 +50,11 @@ See the examples for more information.
 ## Examples
 All the examples are contained in the _examples_ directory.  Simply open up the .html file in your favourite browser (or a non HTML 5 compliant one) and play around with the examples.
 
+The examples are also available to view at the following URLs:
+
+* Parser example: http://guyht.github.com/GWorker/examples/parser/wiki.html
+* SHA-256 example: http://guyht.github.com/GWorker/examples/sha-256/sha-256.html
+
 ## Running the tests
 The tests use the Yahoo UI Test suite.  The dependencies are loaded from the Yahoo servers and so you will need an internet connection to run the tests.  To run the test suite just open up test-suite.html in your browser.
 
