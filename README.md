@@ -2,6 +2,7 @@
 
 ## Preamble
 There are a few things to note before using this script:
+
 * This script is a work in progress and should be considered to be in a beta state
 * This script will not allow multi threading, but will allow web workers, that would otherwise not work in older browsers, to work in synchronously within your scrips.
 * This script may make your JavaScript less secure. 
@@ -24,9 +25,7 @@ In a sense, this script encourages the adoption of web workers.
 
 ### Disadvantages / Limitations
 * This is essentially a hack
-* Not _all_ web workers will work with this script.  This is usually due to one of two things.
- 1. Web workers using other HTML 5 features, such as a canvas
- 2. Problems with duplicate functions (this is because some of the web workers functions will get exposed into the global namespace and could clash with other existing functions)
+* Not _all_ web workers will work with this script.  This is usually due to one of two things. 1. Web workers using other HTML 5 features, such as a canvas. 2. Problems with duplicate functions (this is because some of the web workers functions will get exposed into the global namespace and could clash with other existing functions).
 * Some web workers will require some modification to work, namely declaring the onmessage and postMessage in the _self_ namespace.  This will __not__ break compatibility when not using this script.
 * Your web workers will be run __synchronously__ meaning that your scripts will hang until the web worker has finished executing.
 
