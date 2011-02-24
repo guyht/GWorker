@@ -32,14 +32,13 @@ In a sense, this script encourages the adoption of web workers.
 ## Installation
 Installation is simple.  Simply download the jquery.js and gworker.js files add the following two lines to the head tag of any pages in which your use web workers.
 
-    <!--[if IE]>
     <script src="jquery.js" type="text/javascript"></script>
     <script src="gworker.js" type="text/javascript"></script>
-    <![endif]-->
+
+The script will automatically detect if web workers are supported and only invoke itself if they are not.
 
 Make sure you change the paths so that they point to the correct locations.  If you already use jQuery, then you do not need the jquery.js file, but make sure that jquery is included before gworker.js.  This is because gworker.js uses the jQuery library to implement the importScripts function.  Also make sure that gworker.js is included before any scripts that use web workers.
 
-NOTE: The <!--[if IE]>...<![endif]--> will only load the script for IE browsers (the main culprit for not supporting web workers).  There are other browsers that do no yet support web workers (e.g. old versions of firefox and chrome).  As of yet, you will need to make sure the script is only included in the required browsers (using the above method is a good start, but will not load the script for old versions of FF and chrome).  The next release will include _autodetection_, so the script will automatically detect if web workers are supported.
 
 ### Important
 In order for this script to function, you must declare the onmessage and postMessage functions in your web worker in the __self__ namespace.  This is because the script substitutes the __self__ namespace for a custom variable before loading web workers, allowing each worker to run in its own namespace.  __NOTE:__ Some web workers declare these functions in the __self__ namespace already, some dont.  This will not affect the functionality of your web worker in HTML 5 compliant browsers.

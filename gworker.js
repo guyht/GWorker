@@ -32,9 +32,11 @@ var self;
  *  worker - Location of worker script
  *
  */
-function Worker(worker)
-{
-	return new GWorker(worker);
+if(typeof Worker === 'undefined') {
+	Worker = function(worker)
+	{
+		return new GWorker(worker);
+	};
 }
 
 
