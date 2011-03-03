@@ -1,5 +1,8 @@
 # Documentaion
 
+## Update
+I have removed the need to manually load jQuery.  In order to ensure compatibility with older browsers, jQuery is still required for ajax, but is not loaded on demand from the google CDN.  jQuery is now only loaded if 1) It is not already loaded somewhere in your script and 2) web workers are not supported in the browser.
+
 ## Preamble
 There are a few things to note before using this script:
 
@@ -30,15 +33,13 @@ In a sense, this script encourages the adoption of web workers.
 * Your web workers will be run __synchronously__ meaning that your scripts will hang until the web worker has finished executing.
 
 ## Installation
-Installation is simple.  Simply download the jquery.js and gworker.js files add the following two lines to the head tag of any pages in which your use web workers.
+Installation is simple.  Simply download the gworker.js file add the following line to the head tag of any pages in which your use web workers.
 
-    <script src="jquery.js" type="text/javascript"></script>
     <script src="gworker.js" type="text/javascript"></script>
 
 The script will automatically detect if web workers are supported and only invoke itself if they are not.
 
-Make sure you change the paths so that they point to the correct locations.  If you already use jQuery, then you do not need the jquery.js file, but make sure that jquery is included before gworker.js.  This is because gworker.js uses the jQuery library to implement the importScripts function.  Also make sure that gworker.js is included before any scripts that use web workers.
-
+Make sure you change the paths so that they point to the correct locations. 
 
 ### Important
 In order for this script to function, you must declare the onmessage and postMessage functions in your web worker in the __self__ namespace.  This is because the script substitutes the __self__ namespace for a custom variable before loading web workers, allowing each worker to run in its own namespace.  __NOTE:__ Some web workers declare these functions in the __self__ namespace already, some dont.  This will not affect the functionality of your web worker in HTML 5 compliant browsers.

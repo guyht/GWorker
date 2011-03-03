@@ -33,6 +33,8 @@ var self;
  *
  */
 if(typeof Worker === 'undefined') {
+
+	// Worker function
 	Worker = function(worker)
 	{
 		return new GWorker(worker);
@@ -74,6 +76,8 @@ function GWorker(worker)
 		func = this,
 		num_workers;
 
+	this.ready = true;
+
 	// Setup GWORKER namespace
 	if(typeof GWORKER === 'undefined') {
 		GWORKER = {};
@@ -85,15 +89,15 @@ function GWorker(worker)
 	num_workers = GWORKER.workers.length;
 	GWORKER.workers[num_workers] = {};
 	this.worker_id = num_workers;
+	this.worker_url = worker;
 
-	// Load the worker file using the jQuery ajax library
-	self = GWORKER.workers[this.worker_id];
-	$.ajax({
-		url : worker,
-		dataType : 'script',
-		async : false
+	if(typeof $ !== 'object') {
+		// Load jQuery
+		this.loadJQuery(function() {
+				func.loadWorker();
 		});
-	self = GWORKER.self;
+	}
+
 
 	// Declare onmessage
 	this.onmessage = {};
@@ -102,21 +106,56 @@ function GWorker(worker)
 	GWORKER.workers[this.worker_id].postMessage = function(message) { func.returnMessage(message); };
 	GWORKER.workers[this.worker_id].postmessage = function(message) { func.returnMessage(message); };
 
-	// Post message function.  Note camelCase.
-	this.postMessage = function(message)
-	{
+}
+
+
+GWorker.prototype = {
+
+	postMessage : function(message) {
+		if(!this.ready) {
+			return;
+		}
+
 		self = GWORKER.workers[this.worker_id];
 		GWORKER.workers[this.worker_id].onmessage({'data' : message});
 		self = GWORKER.self;
-	};
+	},
 
-	// Receive reply from worker. Note noncamelcase.
-	this.returnMessage = function(message)
-	{
+	returnMessage : function(message) {
 		this.onmessage({'data' : message});
-	};
+	},
 
-}
+	loadJQuery : function(callback) {
+
+		this.ready = false;
+
+		// Load JQuery library so we can use ajax
+		var jquery_lib = document.createElement('script');
+		jquery_lib.type = 'text/javascript';
+		jquery_lib.src = 'https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js';
+
+		document.body.appendChild(jquery_lib);
+
+		// Callback
+		jquery_lib.onreadystatechange = callback;
+		jquery_lib.onload = callback;
+	 },
+
+	loadWorker : function() {
+		this.ready = true;
+
+		var func = this;
+
+		// Load the worker file using the jQuery ajax library
+		self = GWORKER.workers[this.worker_id];
+		$.ajax({
+			url : func.worker_url,
+			dataType : 'script',
+			async : false
+			});
+		self = GWORKER.self;
+	}
+};
 
 
 
