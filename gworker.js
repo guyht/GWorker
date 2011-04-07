@@ -76,7 +76,11 @@ function GWorker(worker)
 		func = this,
 		num_workers;
 
+    // Store ready state of worker library
 	this.ready = true;
+
+    // Queue to handle requests made while jQuery is loading
+    this.queue = [];
 
 	// Setup GWORKER namespace
 	if(typeof GWORKER === 'undefined') {
@@ -91,6 +95,7 @@ function GWorker(worker)
 	this.worker_id = num_workers;
 	this.worker_url = worker;
 
+    // Load jQuery if required
 	if(typeof $ !== 'object') {
 		// Load jQuery
 		this.loadJQuery(function() {
@@ -98,33 +103,54 @@ function GWorker(worker)
 		});
 	}
 
-
 	// Declare onmessage
 	this.onmessage = {};
 
-	// Setup postmessage function
+	// Setup postMessage function(s) for workers.  These are the callback functions
+    // that the workers will trigger when they have completed their job
 	GWORKER.workers[this.worker_id].postMessage = function(message) { func.returnMessage(message); };
 	GWORKER.workers[this.worker_id].postmessage = function(message) { func.returnMessage(message); };
 
 }
 
 
+/*
+ * Prototyped functions
+ */
 GWorker.prototype = {
 
+    /*
+     * postMessage function to send request to worker
+     *
+     * message - Date to send to worker, can be of any format
+     */
 	postMessage : function(message) {
-		if(!this.ready) {
-			return;
-		}
+
+        if(!this.ready) {
+            this.queue.push(message);
+            return;
+        }
 
 		self = GWORKER.workers[this.worker_id];
 		GWORKER.workers[this.worker_id].onmessage({'data' : message});
 		self = GWORKER.self;
 	},
 
+    /*
+     * returnMessage function to receive and process data
+     * returned by the worker
+     *
+     * message - Data returned by worker
+     */
 	returnMessage : function(message) {
 		this.onmessage({'data' : message});
 	},
 
+    /*
+     * Load the jQuery library on demand
+     *
+     * callback - Callback to be triggered on completion
+     */
 	loadJQuery : function(callback) {
 
 		this.ready = false;
@@ -141,12 +167,16 @@ GWorker.prototype = {
 		jquery_lib.onload = callback;
 	 },
 
+    /*
+     * Load a worker
+     */
 	loadWorker : function() {
 		this.ready = true;
 
 		var func = this;
 
 		// Load the worker file using the jQuery ajax library
+        // TODO : This should be asynchronous for performance reasons
 		self = GWORKER.workers[this.worker_id];
 		$.ajax({
 			url : func.worker_url,
@@ -154,7 +184,25 @@ GWorker.prototype = {
 			async : false
 			});
 		self = GWORKER.self;
-	}
+
+        this.processQueue();
+	},
+    
+    /*
+     * Process queue of messages that have accumulated while jQuery is loading
+     */
+    processQueue : function() {
+       var queue = this.queue,
+            len = queue.length,
+            i;
+            
+        for(i=0;i<len;i++) {
+            this.postMessage(queue[i]);
+        }
+        
+        // Reset queue
+        this.queue = [];
+    }
 };
 
 
